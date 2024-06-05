@@ -56,7 +56,7 @@ fun main() {
     homePage()
 }
 
-fun homePage(){
+fun homePage() {
     val theaterDAO = object : TheaterDAO {
         override fun showNowShowingMovies(showMovies: (List<Movie>) -> Unit) {
             showMovies(movies.getNowShowingMovies())
@@ -70,6 +70,30 @@ fun homePage(){
         override fun showAvailableMovies(showMovies: (List<Movie>) -> Unit) {
             val availableMovies = movies.getNowShowingMovies().filter { it.isTodayInSchedule() }
             showMovies(availableMovies)
+        }
+
+        override fun bookTicket() {
+            print("Input code: ")
+            val codeInput = readlnOrNull()
+            if (!checkMovieCode(codeInput)) {
+                homePage()
+            } else {
+                val targetMovie = codeInput?.let { movies.getMovieByCode(it) }
+                if (targetMovie != null) {
+                    val scheduleList = targetMovie.getMovieShowingSchedule()
+                    scheduleList.forEach { println("${it.key}. ${it.value}") }
+                    println("0. Exit")
+                    println("========================================\n\n")
+                    print("Your option: ")
+                    val dateChoice = inputDateChoice(scheduleList)
+                    println("Please select the show time that you want to book ticket:")
+                    val timeList = targetMovie.getShowTime(dateChoice)
+                    timeList.showShowTime()
+                    print("Your option: ")
+                    val timeChoice = inputTimeChoice(timeList)
+                    println(timeChoice)
+                }
+            }
         }
     }
 
@@ -118,50 +142,59 @@ fun homePage(){
                 theaterDAO.showAvailableMovies(showMovie)
             }
 
-            "4" -> bookTicket()
+            "4" -> theaterDAO.bookTicket()
 
             "5" -> exitProcess(1)
 
-            else -> println("invalid")
+            else -> {
+                println("invalid choice")
+                homePage()
+            }
         }
     }
 }
 
-fun bookTicket() {
-    print("Input code: ")
-    val codeInput = readlnOrNull()
-    if (!checkMovieCode(codeInput)) {
-        homePage()
-    } else {
-        val targetMovie = codeInput?.let { movies.getMovieByCode(it) }
-        if (targetMovie != null) {
-            val scheduleList = targetMovie.getMovieShowingSchedule()
-            scheduleList.forEach { println("${it.key}. ${it.value}") }
-            println("0. Exit")
-            println("========================================\n\n")
-            print("Your option: ")
-            val dateChoice = inputDateChoice(scheduleList)
-//            println(dateChoice)
-            println("Please select the show time that you want to book ticket:")
-            targetMovie.showShowTime()
+fun inputTimeChoice(showTimes: List<ShowTime>): ShowTime? {
+    val choice = readlnOrNull()
+    if (choice?.let { validateTimeChoice(it, showTimes) } == true) {
+        if (choice.toInt() != 0) {
+            return showTimes[choice.toInt() - 1]
+        } else {
+            homePage()
+            return null
         }
     }
+    print("Invalid input! Please try again: ")
+    return inputTimeChoice(showTimes)
 }
 
-fun Movie.showShowTime(){
-    this.showTime.forEach {
-        
-        println(" Time " + it.time + " - " + "Type: " + it.type)
+fun validateTimeChoice(choice: String, showTimes: List<ShowTime>): Boolean =
+    (choice.matches("^[0-9]*".toRegex()) && choice.toInt() in 0..showTimes.size)
+
+fun List<ShowTime>.showShowTime() {
+    var number = 1
+    this.forEach {
+        println("$number. Time: " + it.time + " - " + "Type: " + it.type)
+        number++
     }
+    println("0. Exit")
+}
+
+fun Movie.getShowTime(date: String?): List<ShowTime> {
+    if (date == getCurrentDate()) {
+        return this.showTime.sortedBy { it.time }.filter {
+            it.time < Calendar.getInstance().getTimeStringByFormat(DateFormat.HOUR_MIN.formatter)
+        }
+    }
+    return this.showTime.sortedBy { it.time }
 }
 
 fun inputDateChoice(scheduleList: MutableMap<Int, String>): String? {
     val choice = readlnOrNull()
     if (choice?.let { validateDateChoice(it, scheduleList) } == true) {
-        if(choice.toInt() != 0){
+        if (choice.toInt() != 0) {
             return scheduleList[choice.toInt()]
-        }
-        else{
+        } else {
             homePage()
             return null
         }
