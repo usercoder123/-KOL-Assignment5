@@ -53,7 +53,10 @@ val movies = arrayListOf(movie1, movie2, movie3)
 
 
 fun main() {
+    homePage()
+}
 
+fun homePage(){
     val theaterDAO = object : TheaterDAO {
         override fun showNowShowingMovies(showMovies: (List<Movie>) -> Unit) {
             showMovies(movies.getNowShowingMovies())
@@ -84,8 +87,22 @@ fun main() {
     }
 
     //Home page
+    println("========================================")
+    println("Welcome to -- BHD Movie Theater --")
+    println("Address: 123 A Street")
+    println("Contact: @24XXXXXXX")
+    println("========================================\n\n")
+    println("Please choose below option to continue:")
+    println("1. View now showing movies")
+    println("2. View coming soon movies")
+    println("3. View available movies by data")
+    println("4. View now showing movies")
+    println("5. Exit")
+    println("========================================\n\n")
+    print("Option: ")
+    val option = readlnOrNull()
     while (true) {
-        when (homePage()) {
+        when (option) {
             "1" -> {
                 println("Now showing movies:")
                 theaterDAO.showNowShowingMovies(showMovie)
@@ -110,23 +127,6 @@ fun main() {
     }
 }
 
-fun homePage(): String? {
-    println("========================================")
-    println("Welcome to -- BHD Movie Theater --")
-    println("Address: 123 A Street")
-    println("Contact: @24XXXXXXX")
-    println("========================================\n\n")
-    println("Please choose below option to continue:")
-    println("1. View now showing movies")
-    println("2. View coming soon movies")
-    println("3. View available movies by data")
-    println("4. View now showing movies")
-    println("5. Exit")
-    println("========================================\n\n")
-    print("Option: ")
-    return readlnOrNull()
-}
-
 fun bookTicket() {
     print("Input code: ")
     val codeInput = readlnOrNull()
@@ -137,23 +137,55 @@ fun bookTicket() {
         if (targetMovie != null) {
             val scheduleList = targetMovie.getMovieShowingSchedule()
             scheduleList.forEach { println("${it.key}. ${it.value}") }
+            println("0. Exit")
+            println("========================================\n\n")
+            print("Your option: ")
+            val dateChoice = inputDateChoice(scheduleList)
+//            println(dateChoice)
+            println("Please select the show time that you want to book ticket:")
+            targetMovie.showShowTime()
         }
     }
 }
 
+fun Movie.showShowTime(){
+    this.showTime.forEach {
+        
+        println(" Time " + it.time + " - " + "Type: " + it.type)
+    }
+}
+
+fun inputDateChoice(scheduleList: MutableMap<Int, String>): String? {
+    val choice = readlnOrNull()
+    if (choice?.let { validateDateChoice(it, scheduleList) } == true) {
+        if(choice.toInt() != 0){
+            return scheduleList[choice.toInt()]
+        }
+        else{
+            homePage()
+            return null
+        }
+    }
+    print("Invalid input! Please try again: ")
+    return inputDateChoice(scheduleList)
+}
+
+fun validateDateChoice(choice: String, scheduleList: MutableMap<Int, String>): Boolean =
+    (choice.matches("^[0-9]*".toRegex()) && choice.toInt() in 0..scheduleList.size)
+
 fun Movie.getMovieShowingSchedule(): MutableMap<Int, String> {
     val result = mutableMapOf<Int, String>()
     if (this.isNowShowing() && this.isTodayInSchedule()) {
-        val currentDate = Calendar.getInstance().getTimeStringByFormat(DateFormat.DAY_MONTH_YEAR.formatter)
+        val currentDate = getCurrentDate()
             .toDate(DateFormat.DAY_MONTH_YEAR.formatter)
         val end = this.endDate.toDate(DateFormat.DAY_MONTH_YEAR.formatter)
         var i = 0
         var date = currentDate
         while (date <= end) {
-            if(this.isWeekDayInSchedule(date)){
+            if (this.isWeekDayInSchedule(date)) {
                 i++
-                //hard coded because Vietnam is of UTC+7 -> 1hr slower than default timezone
-                result.put(i, date.plusDays(-1).format(DateTimeFormatter.ofPattern(DateFormat.DAY_MONTH_YEAR.formatter)).toString())
+                result[i] = date.format(DateTimeFormatter.ofPattern(DateFormat.DAY_MONTH_YEAR.formatter))
+                    .toString()
             }
             date = date.plusDays(1)
             if (i == 7) {
@@ -185,9 +217,9 @@ fun Movie.isTodayInSchedule(): Boolean {
     return false
 }
 
-fun Movie.isWeekDayInSchedule(date: LocalDate): Boolean{
+fun Movie.isWeekDayInSchedule(date: LocalDate): Boolean {
     this.schedule.forEach {
-        if(it.index == date.dayOfWeek.value){
+        if (it.index == date.dayOfWeek.value) {
             return true
         }
     }
@@ -195,17 +227,17 @@ fun Movie.isWeekDayInSchedule(date: LocalDate): Boolean{
 }
 
 fun Movie.isMovieStarted(): Boolean {
-    val currentDate = Calendar.getInstance().getTimeStringByFormat(DateFormat.DAY_MONTH_YEAR.formatter)
+    val currentDate = getCurrentDate()
     return this.startDate < currentDate
 }
 
 fun Movie.isMovieExpired(): Boolean {
-    val currentDate = Calendar.getInstance().getTimeStringByFormat(DateFormat.DAY_MONTH_YEAR.formatter)
+    val currentDate = getCurrentDate()
     return this.endDate < currentDate
 }
 
 fun Movie.isNowShowing(): Boolean {
-    val currentDate = Calendar.getInstance().getTimeStringByFormat(DateFormat.DAY_MONTH_YEAR.formatter)
+    val currentDate = getCurrentDate()
     return currentDate in (this.startDate..this.endDate)
 }
 
@@ -222,3 +254,5 @@ fun String.toDate(formatter: String): LocalDate {
     val dateFormatter = DateTimeFormatter.ofPattern(formatter).withLocale(Locale.getDefault())
     return LocalDate.parse(this, dateFormatter)
 }
+
+fun getCurrentDate() = Calendar.getInstance().getTimeStringByFormat(DateFormat.DAY_MONTH_YEAR.formatter)
