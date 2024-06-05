@@ -1,4 +1,4 @@
-import enums.DaysOfWeek
+import enums.*
 import dao.TheaterDAO
 import models.Movie
 import models.ShowTime
@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
+
 
 val movie1 = Movie(
     moviesName = "Inception",
@@ -64,7 +65,7 @@ fun main() {
         }
 
         override fun showAvailableMovies(showMovies: (List<Movie>) -> Unit) {
-            val availableMovies = movies.getNowShowingMovies().filter { it.isWeekDayInSchedule() }
+            val availableMovies = movies.getNowShowingMovies().filter { it.isTodayInSchedule() }
             showMovies(availableMovies)
         }
     }
@@ -126,7 +127,7 @@ fun homePage(): String? {
     return readlnOrNull()
 }
 
-fun bookTicket(): Unit {
+fun bookTicket() {
     print("Input code: ")
     val codeInput = readlnOrNull()
     if (!checkMovieCode(codeInput)) {
@@ -134,22 +135,30 @@ fun bookTicket(): Unit {
     } else {
         val targetMovie = codeInput?.let { movies.getMovieByCode(it) }
         if (targetMovie != null) {
-            println(targetMovie.getMovieShowingSchedule())
+            val scheduleList = targetMovie.getMovieShowingSchedule()
+            scheduleList.forEach { println("${it.key}. ${it.value}") }
         }
     }
 }
 
-fun Movie.getMovieShowingSchedule(): ArrayList<String> {
-    val result = ArrayList<String>()
-    if (this.isNowShowing() && this.isWeekDayInSchedule()) {
-        val currentDate = Calendar.getInstance().getTimeStringByFormat("dd/MM/YYYY")
-            .toDate("dd/MM/YYYY")
-        val end = this.endDate.toDate("dd/MM/YYYY")
+fun Movie.getMovieShowingSchedule(): MutableMap<Int, String> {
+    val result = mutableMapOf<Int, String>()
+    if (this.isNowShowing() && this.isTodayInSchedule()) {
+        val currentDate = Calendar.getInstance().getTimeStringByFormat(DateFormat.DAY_MONTH_YEAR.formatter)
+            .toDate(DateFormat.DAY_MONTH_YEAR.formatter)
+        val end = this.endDate.toDate(DateFormat.DAY_MONTH_YEAR.formatter)
         var i = 0
-        while (currentDate <= end && i <= 7) {
-            i++
-            currentDate.plusDays(1)
-            println("$i. $currentDate")
+        var date = currentDate
+        while (date <= end) {
+            if(this.isWeekDayInSchedule(date)){
+                i++
+                //hard coded because Vietnam is of UTC+7 -> 1hr slower than default timezone
+                result.put(i, date.plusDays(-1).format(DateTimeFormatter.ofPattern(DateFormat.DAY_MONTH_YEAR.formatter)).toString())
+            }
+            date = date.plusDays(1)
+            if (i == 7) {
+                break
+            }
         }
     }
     return result
@@ -161,11 +170,11 @@ fun checkMovieCode(codeInput: String?): Boolean {
 }
 
 fun ArrayList<Movie>.getMovieByCode(code: String): Movie? {
-    val result = this.filter { it.code == code }
+    val result = this.filter { it.code.lowercase() == code.lowercase() }
     return if (result.isEmpty()) null else result[0]
 }
 
-fun Movie.isWeekDayInSchedule(): Boolean {
+fun Movie.isTodayInSchedule(): Boolean {
     val currentDate = Calendar.getInstance()
     val currentWeekDay = currentDate.get(Calendar.DAY_OF_WEEK)
     this.schedule.forEach { d ->
@@ -176,18 +185,27 @@ fun Movie.isWeekDayInSchedule(): Boolean {
     return false
 }
 
+fun Movie.isWeekDayInSchedule(date: LocalDate): Boolean{
+    this.schedule.forEach {
+        if(it.index == date.dayOfWeek.value){
+            return true
+        }
+    }
+    return false
+}
+
 fun Movie.isMovieStarted(): Boolean {
-    val currentDate = Calendar.getInstance().getTimeStringByFormat("dd/MM/YYYY")
+    val currentDate = Calendar.getInstance().getTimeStringByFormat(DateFormat.DAY_MONTH_YEAR.formatter)
     return this.startDate < currentDate
 }
 
 fun Movie.isMovieExpired(): Boolean {
-    val currentDate = Calendar.getInstance().getTimeStringByFormat("dd/MM/YYYY")
+    val currentDate = Calendar.getInstance().getTimeStringByFormat(DateFormat.DAY_MONTH_YEAR.formatter)
     return this.endDate < currentDate
 }
 
 fun Movie.isNowShowing(): Boolean {
-    val currentDate = Calendar.getInstance().getTimeStringByFormat("dd/MM/YYYY")
+    val currentDate = Calendar.getInstance().getTimeStringByFormat(DateFormat.DAY_MONTH_YEAR.formatter)
     return currentDate in (this.startDate..this.endDate)
 }
 
@@ -201,5 +219,6 @@ fun Calendar.getTimeStringByFormat(format: String): String {
 }
 
 fun String.toDate(formatter: String): LocalDate {
-    return LocalDate.parse(this, DateTimeFormatter.ofPattern(formatter))
+    val dateFormatter = DateTimeFormatter.ofPattern(formatter).withLocale(Locale.getDefault())
+    return LocalDate.parse(this, dateFormatter)
 }
