@@ -110,7 +110,7 @@ fun homePage() {
         println()
     }
 
-    //Home page
+    //Menu
     println("========================================")
     println("Welcome to -- BHD Movie Theater --")
     println("Address: 123 A Street")
