@@ -1,0 +1,135 @@
+[
+  {
+    "theaterName": "Cinema Park",
+    "address": "123 Movie Lane, Film City",
+    "contact": "123-456-7890",
+    "movies": [
+      {
+        "moviesName": "Inception",
+        "code": "INC123",
+        "startDate": "04/06/2024",
+        "endDate": "15/06/2024",
+        "schedule": ["MONDAY", "WEDNESDAY", "FRIDAY"],
+        "duration": 148,
+        "showTime": [
+          {
+            "time": "14:30",
+            "type": "2D",
+            "room": "Room 1"
+          },
+          {
+            "time": "19:45",
+            "type": "3D",
+            "room": "Room 2"
+          }
+        ]
+      },
+      {
+        "moviesName": "The Matrix",
+        "code": "MTR456",
+        "startDate": "15/06/2024",
+        "endDate": "25/06/2024",
+        "schedule": ["TUESDAY", "THURSDAY", "SATURDAY"],
+        "duration": 136,
+        "showTime": [
+          {
+            "time": "16:00",
+            "type": "2D",
+            "room": "Room 3"
+          },
+          {
+            "time": "20:30",
+            "type": "3D",
+            "room": "Room 4"
+          }
+        ]
+      },
+      {
+        "moviesName": "Avatar",
+        "code": "AVT789",
+        "startDate": "03/06/2024",
+        "endDate": "12/06/2024",
+        "schedule": ["THURSDAY", "FRIDAY", "SUNDAY"],
+        "duration": 162,
+        "showTime": [
+          {
+            "time": "13:00",
+            "type": "2D",
+            "room": "Room 5"
+          },
+          {
+            "time": "18:30",
+            "type": "3D",
+            "room": "Room 6"
+          }
+        ]
+      }
+    ],
+    "price": [
+      {
+        "type": "3D",
+        "price": 12.50
+      },
+      {
+        "type": "2D",
+        "price": 8.00
+      }
+    ],
+    "rooms": [
+      {
+        "name": "Room 1",
+        "map": [
+          [0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 1, 1, 1, 1, 1, 0, 0],
+          [0, 0, 1, 1, 1, 1, 1, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+      },
+      {
+        "name": "Room 2",
+        "map": [
+          [0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 1, 1, 1, 1, 1, 0, 0],
+          [0, 0, 1, 1, 1, 1, 1, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+      },
+      {
+        "name": "Room 3",
+        "map": [
+          [0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 1, 1, 1, 1, 1, 0, 0],
+          [0, 0, 1, 1, 1, 1, 1, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+      },
+      {
+        "name": "Room 4",
+        "map": [
+          [0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 1, 1, 1, 1, 1, 0, 0],
+          [0, 0, 1, 1, 1, 1, 1, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+      },
+      {
+        "name": "Room 5",
+        "map": [
+          [0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 1, 1, 1, 1, 1, 0, 0],
+          [0, 0, 1, 1, 1, 1, 1, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+      },
+      {
+        "name": "Room 6",
+        "map": [
+          [0, 0, 0, 0, 0, 0, 0, 0, 0],
+          [0, 0, 1, 1, 1, 1, 1, 0, 0],
+          [0, 0, 1, 1, 1, 1, 1, 0, 0],
+          [0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+      }
+    ]
+  }
+]

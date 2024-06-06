@@ -2,5 +2,5 @@ package models
 
 data class Price (
     val type: String,
-    val price: Int
+    val price: Float
 )
