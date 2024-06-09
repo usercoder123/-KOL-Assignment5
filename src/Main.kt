@@ -374,8 +374,12 @@ fun Movie.isTodayInSchedule(): Boolean {
 }
 
 fun Movie.isWeekDayInSchedule(date: LocalDate): Boolean {
+    var dayOfWeekValue = date.dayOfWeek.value + 1
+    if(dayOfWeekValue == 8){ //Sunday
+        dayOfWeekValue = 1
+    }
     this.schedule.forEach {
-        if (it.index == date.dayOfWeek.value) {
+        if (it.index == dayOfWeekValue) {
             return true
         }
     }
