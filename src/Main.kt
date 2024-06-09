@@ -144,7 +144,7 @@ fun homePage(theater: Theater) {
                         println("Movie Type: " + timeChoice.type)
                         println("Affected date: $dateChoice")
                         println("Show Time: " + timeChoice.time)
-                        print("Slot $slot")
+                        print("Slot: $slot")
                         var price = theater.getRawPrice(timeChoice.type)
                         // for VIP slots
                         if (vipSlots.contains(slot)) {
