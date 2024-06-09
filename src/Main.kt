@@ -155,7 +155,7 @@ fun homePage(theater: Theater) {
                         println("========================================")
                         println("Hope you enjoy this movie.\n\n")
                         println("Press Enter key to continue...")
-                        val enterKey = readln()
+                        readln()
                         homePage(theater)
                     }
                 }
