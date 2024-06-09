@@ -186,7 +186,7 @@ fun homePage(theater: Theater) {
     println("1. View now showing movies")
     println("2. View coming soon movies")
     println("3. View available movies by data")
-    println("4. View now showing movies")
+    println("4. Book ticket")
     println("5. Exit")
     println("========================================\n\n")
     print("Option: ")
